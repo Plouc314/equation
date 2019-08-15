@@ -10,11 +10,16 @@ dif = []
 string = []
 equality = []
 min_provi = 0
-inc_starts_values = [0,0.3,-0.3,5,-5,10,-10,3,-3]
+total_tested_value = 0
+input_start_values = input("valeurs de depart (9): ")
+inc_starts_values = input_start_values.strip().split(" ")
+for i in range(len(inc_starts_values)):
+    inc_starts_values[i] = float(inc_starts_values[i])
 number_try_start = 0
 index_zero_int = 0
 index_zero_array = []
 pas_touche_dif = []
+failed_final_inc = []
 number_equa = input("nombre d'equations: ")
 for i in range(int(number_equa)):
     string.append(input("equ : "))
@@ -26,6 +31,7 @@ def analyse(string):
     global index_zero_array
     global dif
     global pas_touche_dif
+    global failed_final_inc
     for a in range(len(string)):
         part1 = ""
         part2 = ""
@@ -55,6 +61,8 @@ def analyse(string):
                         part2 = part2 + " " + string[a][e + i + 1]
                     part2 = part2.strip()
         equality.append(part1 + " = " + part2)
+    for i in range(len(inc)):
+        failed_final_inc.append([])
 
     print(equality)
     for i in range(len(inc)):
@@ -258,6 +266,8 @@ def compare(equality):
     global index_zero_int
     global index_zero_array
     global pas_touche_dif
+    global failed_final_inc
+    global total_tested_value
     possible_v = set_int(inc,dif,equality)
     result = []
     dif_result = []
@@ -311,10 +321,20 @@ def compare(equality):
     #print(str(index) + " INDEX")
     
     if index == 0:
-        print("ZERO")
-        print(inc)
+        #print("ZERO")
+        #print(inc)
         #print(index_zero_int)
         new_values_needed = 0
+        test = 0
+        for i in range(len(inc)):
+            test_inc = 0
+            for e in range(len(failed_final_inc[i])):
+                if isclose(inc[i][1],failed_final_inc[i][e],rel_tol=1e-3):
+                    test_inc = 1
+            test = test + test_inc
+        if test == len(inc):
+            print("same_final_value")
+            new_values_needed = 1
         test = 0
         for i in range(len(inc)):
             if index_zero_array[i] == len(str(inc[i][1])):
@@ -325,7 +345,6 @@ def compare(equality):
             index_zero_int = 0
         if index_zero_int == 7:
             index_zero_int = 0
-            print("same length")
             new_values_needed = 1
         index_zero_array = []
         for i in range(len(inc)):
@@ -348,42 +367,22 @@ def compare(equality):
                         if test0 == 3 or test9 == 3:
                             new_values_needed = 1
         if new_values_needed == 1:
-            print(str(inc) + " OLD INC")
-            if number_try_start < 9**len(inc):
-                repartition = base_n(number_try_start,len(inc),9)
+            #print(str(inc) + " OLD INC")
+            test = 0
+            for e in range(len(failed_final_inc[i])):
+                if inc[i][1] == failed_final_inc[i][e]:
+                    test = 1
+            if test == 0:
                 for i in range(len(inc)):
-                    inc[i][1] = inc_starts_values[int(repartition[i:i + 1])]
-                number_try_start = number_try_start + 1
-                print(str(dif) + " dif")
-                print(str(pas_touche_dif) + " pas_touche_dif")
-                dif = pas_touche_dif
-                print(str(dif) + " dif")
-                print(str(pas_touche_dif) + " pas_touche_dif")
-                #print(str(inc) + " NEW START VALUES")
-                print(str(number_try_start))
-                string_equality = []
-                for a in range(len(equality)):
-                    string_equality.append(equality[a].split(" = "))
-                    string_equality[a][0] = string_equality[a][0].split(" ")
-                    string_equality[a][1] = string_equality[a][1].split(" ")
-                for a in range(len(equality)):
-                    for i in range(2):
-                        for e in range(len(string_equality[a][i])):
-                            for u in range(len(inc)):
-                                if string_equality[a][i][e] == inc[u][0]:
-                                    string_equality[a][i][e] = inc[u][1]
-                string_min_value = []
-                for a in range(len(equality)):
-                    string_part = ["",""]
-                    for i in range(2):
-                        for e in range(len(string_equality[a][i])):
-                            string_part[i] = string_part[i] + str(string_equality[a][i][e]) + " "
-                            string_part[i].strip()
-                    string_min_value.append(string_part)
-                #print(str(string_min_value) + " STRING_MIN_VALUE")
-                return string_min_value
+                    failed_final_inc[i].append(inc[i][1])
+            #print(str(failed_final_inc)+ " failed_final_inc")
+            if number_try_start < 9**len(inc):
+                return set_when_new_value_needed(inc,inc_starts_values,equality)
             else:
-                print("STOP")
+                calc_start_values()
+                print("Nouvelles valeurs de départs...")
+                total_tested_value = total_tested_value + number_try_start
+                number_try_start = 0
         else:
             for i in range(len(inc)):
                 dif[i] = dif[i] / 2
@@ -457,6 +456,74 @@ def new_inc(string_min_value,inc,part):
                 inc[i][1] = float(string_min_value_a2[e])   
     #print(str(inc) + " NEW INC")
     return inc
+
+def set_when_new_value_needed(inc,inc_starts_values,equality):
+    global number_try_start
+    global dif
+    global pas_touche_dif
+    repartition = base_n(number_try_start,len(inc),9)
+    for i in range(len(inc)):
+        inc[i][1] = inc_starts_values[int(repartition[i:i + 1])]
+    number_try_start = number_try_start + 1
+    #print(str(dif) + " dif")
+    #print(str(pas_touche_dif) + " pas_touche_dif")
+    for i in range(len(dif)):
+        dif[i] = pas_touche_dif[i]
+    #print(str(inc) + " NEW START VALUES")
+    print(str(number_try_start))
+    string_equality = []
+    for a in range(len(equality)):
+        string_equality.append(equality[a].split(" = "))
+        string_equality[a][0] = string_equality[a][0].split(" ")
+        string_equality[a][1] = string_equality[a][1].split(" ")
+    for a in range(len(equality)):
+        for i in range(2):
+            for e in range(len(string_equality[a][i])):
+                for u in range(len(inc)):
+                    if string_equality[a][i][e] == inc[u][0]:
+                        string_equality[a][i][e] = inc[u][1]
+    string_min_value = []
+    for a in range(len(equality)):
+        string_part = ["",""]
+        for i in range(2):
+            for e in range(len(string_equality[a][i])):
+                string_part[i] = string_part[i] + str(string_equality[a][i][e]) + " "
+                string_part[i].strip()
+        string_min_value.append(string_part)
+    #print(str(string_min_value) + " STRING_MIN_VALUE")
+    return string_min_value
+
+
+
+def calc_start_values():
+    global inc_starts_values
+    new_inc_starts_values = []
+    total_value = [0,0]
+    for i in range(len(inc_starts_values)):
+        total_value[0] = total_value[0] + inc_starts_values[i]
+    for i in range(len(inc_starts_values) - 1):
+        moyenne = (inc_starts_values[i] + inc_starts_values[i + 1]) / 2
+        new_inc_starts_values.append(moyenne)
+        total_value[1] = total_value[1] + new_inc_starts_values[i]
+    last_value = total_value[0] - total_value[1]
+    i = 0
+    while last_value > new_inc_starts_values[i]:
+        i = i + 1
+    provisoire = [new_inc_starts_values[i]]
+    new_inc_starts_values[i] = last_value
+    i = i + 1
+    while i != len(new_inc_starts_values):
+        provisoire.append(new_inc_starts_values[i])
+        new_inc_starts_values[i] = provisoire[0]
+        provisoire.pop(0)
+        i = i + 1
+    new_inc_starts_values.append(provisoire[0])
+    print(new_inc_starts_values)
+    for i in range(len(inc_starts_values)):
+        inc_starts_values[i] = new_inc_starts_values[i]
+
+    
+
 def run(string):
     global inc
     global number_try_start
@@ -490,7 +557,12 @@ def run(string):
             for a in range(len(equality)):
                 inc = new_inc(string_min_value[a],inc,equality[a]) 
 
-run(string)
+#run(string)
 #min([[1,2,"division error",4,5],[10,9,7,4,2],[2,2,2,0,14]])
 #print(base_n(8428,4,10))
 #print(trunc_needed(1.23475063))
+calc_start_values()
+calc_start_values()
+calc_start_values()
+calc_start_values()
+calc_start_values()

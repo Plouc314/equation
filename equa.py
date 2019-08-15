@@ -64,7 +64,7 @@ def analyse(string):
     for i in range(len(inc)):
         failed_final_inc.append([])
 
-    print(equality)
+    #print(equality)
     for i in range(len(inc)):
         index_zero_array.append(0)
         dif.append(float(input("dif de " + inc[i][0] + " : ").strip()))
@@ -265,7 +265,6 @@ def compare(equality):
     global number_try_start
     global index_zero_int
     global index_zero_array
-    global pas_touche_dif
     global failed_final_inc
     global total_tested_value
     possible_v = set_int(inc,dif,equality)
@@ -300,7 +299,7 @@ def compare(equality):
             else:
                 error = 1
         if test == len(equality): 
-            print("EQUAL") 
+            #print("EQUAL") 
             for a in range(len(equality)):
                 returned.append(possible_v[a][i])
             returned.append("equal")
@@ -333,7 +332,7 @@ def compare(equality):
                     test_inc = 1
             test = test + test_inc
         if test == len(inc):
-            print("same_final_value")
+            #print("same_final_value")
             new_values_needed = 1
         test = 0
         for i in range(len(inc)):
@@ -383,6 +382,7 @@ def compare(equality):
                 print("Nouvelles valeurs de départs...")
                 total_tested_value = total_tested_value + number_try_start
                 number_try_start = 0
+                return set_when_new_value_needed(inc,inc_starts_values,equality)
         else:
             for i in range(len(inc)):
                 dif[i] = dif[i] / 2
@@ -470,7 +470,7 @@ def set_when_new_value_needed(inc,inc_starts_values,equality):
     for i in range(len(dif)):
         dif[i] = pas_touche_dif[i]
     #print(str(inc) + " NEW START VALUES")
-    print(str(number_try_start))
+    #print(str(number_try_start))
     string_equality = []
     for a in range(len(equality)):
         string_equality.append(equality[a].split(" = "))
@@ -518,7 +518,7 @@ def calc_start_values():
         provisoire.pop(0)
         i = i + 1
     new_inc_starts_values.append(provisoire[0])
-    print(new_inc_starts_values)
+    #print(new_inc_starts_values)
     for i in range(len(inc_starts_values)):
         inc_starts_values[i] = new_inc_starts_values[i]
 
@@ -526,6 +526,7 @@ def calc_start_values():
 
 def run(string):
     global inc
+    global total_tested_value
     global number_try_start
     analyse(string)
     #print(" INC STAARST " + str(inc_starts_values))
@@ -551,18 +552,17 @@ def run(string):
                 prep_inc = inc[i][1]
                 prep_inc = trunc(100000000*prep_inc)/100000000
                 print(inc[i][0] + " = " + str(prep_inc))
-            print(" Number of started values tried: " + str(number_try_start))
+            if total_tested_value != 0:
+                print("Number of started values tried: " + str(total_tested_value))
+            else:
+                print("Number of started values tried: " + str(number_try_start))
             print("time: " + str(process_time()))
         else:
             for a in range(len(equality)):
                 inc = new_inc(string_min_value[a],inc,equality[a]) 
 
-#run(string)
+run(string)
 #min([[1,2,"division error",4,5],[10,9,7,4,2],[2,2,2,0,14]])
 #print(base_n(8428,4,10))
 #print(trunc_needed(1.23475063))
-calc_start_values()
-calc_start_values()
-calc_start_values()
-calc_start_values()
-calc_start_values()
+#calc_start_values()

@@ -9,10 +9,15 @@ inc = []
 dif = []
 string = []
 equality = []
+final_inc_values_work = []
 min_provi = 0
 total_tested_value = 0
+multi_final_inc_value = 0
+number_calc_depart_values = 0
 input_start_values = input("valeurs de depart (9): ")
 inc_starts_values = input_start_values.strip().split(" ")
+if len(inc_starts_values) != 9:
+    inc_starts_values = [-10,-5,-1,-0.5,0,0.5,1,5,10]
 for i in range(len(inc_starts_values)):
     inc_starts_values[i] = float(inc_starts_values[i])
 number_try_start = 0
@@ -22,7 +27,7 @@ pas_touche_dif = []
 failed_final_inc = []
 number_equa = input("nombre d'equations: ")
 for i in range(int(number_equa)):
-    string.append(input("equ : "))
+    string.append(input("equation: "))
     string[i] = string[i].split(" ")
 
 def analyse(string):
@@ -32,6 +37,8 @@ def analyse(string):
     global dif
     global pas_touche_dif
     global failed_final_inc
+    global multi_final_inc_value
+    global final_inc_values_work
     for a in range(len(string)):
         part1 = ""
         part2 = ""
@@ -63,11 +70,16 @@ def analyse(string):
         equality.append(part1 + " = " + part2)
     for i in range(len(inc)):
         failed_final_inc.append([])
-
+    input_multi = input("chercher le plus de valeurs possibles (oui/non): ")
+    if input_multi == 'oui':
+        multi_final_inc_value = 1
+    else:
+        multi_final_inc_value = 0
     #print(equality)
     for i in range(len(inc)):
         index_zero_array.append(0)
         dif.append(float(input("dif de " + inc[i][0] + " : ").strip()))
+        final_inc_values_work.append([])
     for i in range(len(dif)):
         pas_touche_dif.append(dif[i])
     #inc = [['x',0.3],['y',3],['z',-3]]
@@ -267,6 +279,7 @@ def compare(equality):
     global index_zero_array
     global failed_final_inc
     global total_tested_value
+    global number_calc_depart_values
     possible_v = set_int(inc,dif,equality)
     result = []
     dif_result = []
@@ -379,6 +392,7 @@ def compare(equality):
                 return set_when_new_value_needed(inc,inc_starts_values,equality)
             else:
                 calc_start_values()
+                number_calc_depart_values = number_calc_depart_values + 1
                 print("Nouvelles valeurs de départs...")
                 total_tested_value = total_tested_value + number_try_start
                 number_try_start = 0
@@ -528,6 +542,11 @@ def run(string):
     global inc
     global total_tested_value
     global number_try_start
+    global multi_final_inc_value
+    global final_inc_values_work
+    global failed_final_inc
+    global inc_starts_values
+    global number_calc_depart_values
     analyse(string)
     #print(" INC STAARST " + str(inc_starts_values))
     test = 0
@@ -538,25 +557,46 @@ def run(string):
         #print(str(inc) + " INC AFTER COMPARE")
         #print("BELLOW")
         #print(string_min_value)
-        if len(string_min_value) == len(equality) + 1:
+        if number_calc_depart_values == 3:
             test = 1
+        if len(string_min_value) == len(equality) + 1:
+            if multi_final_inc_value == 0:
+                test = 1
             #print("EQUAL")
             #print(str(string_min_value) + "string_min_value")
             for a in range(len(equality)):
                 #print(str(inc) + " inc b")
                 inc = new_inc(string_min_value[a],inc,equality[a])
                 #print(str(inc) + " inc after")
+            test_same_final_value = 0
             for i in range(len(inc)):
                 trunc_needed(inc[i][1])
-            for i in range(len(inc)):
-                prep_inc = inc[i][1]
-                prep_inc = trunc(100000000*prep_inc)/100000000
-                print(inc[i][0] + " = " + str(prep_inc))
-            if total_tested_value != 0:
-                print("Number of started values tried: " + str(total_tested_value))
+                for e in range(len(final_inc_values_work[i])):
+                    if inc[i][1] == final_inc_values_work[i][e]:
+                        test_same_final_value = 1
+            #print(str(final_inc_values_work) + " final_inc_values_work")
+            if test_same_final_value == 0:
+                for i in range(len(inc)):
+                    final_inc_values_work[i].append(inc[i][1])
+                    failed_final_inc[i].append(final_inc_values_work[i][len(final_inc_values_work) - 1])
+                    prep_inc = inc[i][1]
+                    prep_inc = trunc(100000000*prep_inc)/100000000
+                    print(inc[i][0] + " = " + str(prep_inc))
+                if total_tested_value != 0:
+                    print("Nombre de valeurs de départs testées: " + str(total_tested_value + 1))
+                else:
+                    print("Nombre de valeurs de départs testées: " + str(number_try_start + 1))
+                print("Temps: " + str(process_time()))
             else:
-                print("Number of started values tried: " + str(number_try_start))
-            print("time: " + str(process_time()))
+                if number_try_start < 9**len(inc):
+                    set_when_new_value_needed(inc,inc_starts_values,equality)
+                else:
+                    calc_start_values()
+                    number_calc_depart_values = number_calc_depart_values + 1
+                    print("Nouvelles valeurs de départs...")
+                    total_tested_value = total_tested_value + number_try_start
+                    number_try_start = 0
+                    set_when_new_value_needed(inc,inc_starts_values,equality)
         else:
             for a in range(len(equality)):
                 inc = new_inc(string_min_value[a],inc,equality[a]) 

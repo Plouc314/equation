@@ -578,12 +578,12 @@ def run(string):
             if test_same_final_value == 0:
                 for i in range(len(inc)):
                     final_inc_values_work[i].append(inc[i][1])
-                    failed_final_inc[i].append(final_inc_values_work[i][len(final_inc_values_work) - 1])
+                    failed_final_inc[i].append(final_inc_values_work[i][len(final_inc_values_work[i]) - 1])
                     prep_inc = inc[i][1]
                     prep_inc = trunc(100000000*prep_inc)/100000000
                     print(inc[i][0] + " = " + str(prep_inc))
                 if total_tested_value != 0:
-                    print("Nombre de valeurs de départs testées: " + str(total_tested_value + 1))
+                    print("Nombre de valeurs de départs testées: " + str(total_tested_value + number_try_start + 1))
                 else:
                     print("Nombre de valeurs de départs testées: " + str(number_try_start + 1))
                 print("Temps: " + str(process_time()))

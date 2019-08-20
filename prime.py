@@ -1,39 +1,30 @@
 from math import trunc
 from math import sqrt
 from time import process_time
-def prime_search(number):
+diviseur = []
+def prime_search(number,i_start_value):
+    global diviseur
     number_calc = number
     test = 0
-    diviseur = []
     while test == 0:
         old_number_calc = number_calc
-        i = 2
-        while i <= trunc(sqrt(number_calc)) + 1:
-            if search_point_zero(number_calc/i):
-                old_i = i
-                diviseur.append(i)
-                i = trunc(sqrt(number_calc)) + 1
-                number_calc = number_calc/old_i
-            else:
-                i = i + 1
+        number_calc = default_divide(number_calc,i_start_value)
         if number_calc == old_number_calc:
             test = 1
-    print("Temps: " + str(process_time()))
-    if len(diviseur) != 0:
-        diviseur.append(number_calc)
-        print(str(number) + " n'est pas premier -> " + str(number) + " = " + build_message(diviseur))
-    else:
-        print(str(number) + " est premier.")
-        return number
+    display_result(number,diviseur,number_calc)
     
 def prime_search_in_prime(number):
+    global diviseur
     number_calc = number
     test = 0
-    diviseur = []
     content = read_content_array("prime_data.txt","\n")
+
     while test == 0:
         old_number_calc = number_calc
-        duration = search_nearest_prime(number_calc,content)
+        if number > 1000000000000:
+            duration = len(content) - 1
+        else:
+            duration = search_nearest_prime(number_calc,content)
         i = 0
         while i != duration:
             if search_point_zero(number_calc / int(content[i])):
@@ -44,10 +35,29 @@ def prime_search_in_prime(number):
             else:
                 i = i + 1
         if number_calc == old_number_calc:
+            if number_calc > 1000000000000:
+                print("Recherche non-optimisée...")
+                prime_search(number_calc,1000000000001)
             test = 1
+    display_result(number,diviseur,number_calc)
+
+def default_divide(number_calc,i_start_value):
+    global diviseur
+    i = i_start_value
+    while i <= trunc(sqrt(number_calc)) + 1:
+        if search_point_zero(number_calc/i):
+            old_i = i
+            diviseur.append(i)
+            i = trunc(sqrt(number_calc)) + 1
+            number_calc = number_calc/old_i
+        else:
+            i = i + 1
+    return number_calc
+        
+def display_result(number,diviseur,number_calc):
     print("Temps: " + str(process_time()))
     if len(diviseur) != 0:
-        diviseur.append(number_calc)
+        diviseur.append(int(number_calc))
         print(str(number) + " n'est pas premier -> " + str(number) + " = " + build_message(diviseur))
     else:
         print(str(number) + " est premier.")
@@ -76,14 +86,12 @@ def search_nearest_prime(number_calc,content):
 def build_message(diviseur):
     message = str(diviseur[0])
     for i in range(len(diviseur) - 1):
-        message = message + " * " + str(diviseur[i + 1])
+        if diviseur[i + 1] != 1:
+            message = message + " * " + str(diviseur[i + 1])
     return message
 
 def normal_run(number):
-    if number > 1000000000000:
-        prime_search(number)
-    else:
-        prime_search_in_prime(number)
+    prime_search_in_prime(number)
 
 def add_prime_data(lower_number,higher_number):
     file = open("prime_data.txt","a")
@@ -94,5 +102,7 @@ def add_prime_data(lower_number,higher_number):
     file.close()
     print(process_time())
 
-number = int(input(" Entrer un nombre (temps de calcul x50 apres 1000000000000): "))
+number = int(input(" Entrer un nombre: "))
+print("...\n")
 normal_run(number)
+print("\n")

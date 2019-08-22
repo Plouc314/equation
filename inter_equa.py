@@ -1,2 +1,2 @@
-array = []
-print(len(array))
+array = '12.3435'
+print(array.find('.'))

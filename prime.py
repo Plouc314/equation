@@ -1,8 +1,9 @@
+#1928374657283918273640182976 = 1000000000001 * 1928374657281990
 from math import trunc
 from math import sqrt
 from time import process_time
 diviseur = []
-def prime_search(number,i_start_value):
+def prime_search(number,i_start_value,primary_number):
     global diviseur
     number_calc = number
     test = 0
@@ -11,14 +12,14 @@ def prime_search(number,i_start_value):
         number_calc = default_divide(number_calc,i_start_value)
         if number_calc == old_number_calc:
             test = 1
-    display_result(number,diviseur,number_calc)
+    display_result(primary_number,diviseur,number_calc)
     
 def prime_search_in_prime(number):
     global diviseur
     number_calc = number
     test = 0
     content = read_content_array("prime_data.txt","\n")
-
+    diviseur = []
     while test == 0:
         old_number_calc = number_calc
         if number > 1000000000000:
@@ -37,9 +38,9 @@ def prime_search_in_prime(number):
         if number_calc == old_number_calc:
             if number_calc > 1000000000000:
                 print("Recherche non-optimisée...")
-                prime_search(number_calc,1000000000001)
+                return prime_search(number_calc,1000000000001,number)
             test = 1
-    display_result(number,diviseur,number_calc)
+    return display_result(number,diviseur,number_calc)
 
 def default_divide(number_calc,i_start_value):
     global diviseur

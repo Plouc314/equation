@@ -18,7 +18,7 @@ def prime_search_in_prime(number):
     global diviseur
     number_calc = number
     test = 0
-    content = read_content_array("prime_data.txt","\n")
+    content = read_content_array("/home/alexandre/Documents/python/math/prime_data.txt","\n")
     diviseur = []
     while test == 0:
         old_number_calc = number_calc
@@ -105,5 +105,5 @@ def add_prime_data(lower_number,higher_number):
 
 number = int(input(" Entrer un nombre: "))
 print("...\n")
-normal_run(number)
+add_prime_data(1000001,1100000)
 print("\n")

@@ -189,9 +189,9 @@ def construct_diagonal2():
 
 
 #construct_spiral()
-#construct_line()
+construct_line()
 #construct_diagonal()
-construct_diagonal2()
+#construct_diagonal2()
 
 done = False
 while running:

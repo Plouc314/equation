@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import subprocess
 from math import gcd
 from math import ceil
 from math import modf
@@ -107,13 +109,37 @@ display_func(Inc_2)
 
 
 #calc suite
-suite=[]
-for e in range(15):
+for e in range(len(Inc)+5):
     a = e+1
     num = 0
     for i in range(shape):
         num+= Inc[i]*(a**(shape-1-i))
+    if num <0:
+        arrondi = ceil(num+1)
+    else: arrondi = ceil(num)
     if modf(num)[0] < 0.5 and modf(num)[0] != 0:
-        print(ceil(num-1))
+            print(arrondi-1)
     else:
         print(ceil(num))
+
+def figure(Inc,shape,pre):
+    suite = [[],[]]
+    suite2 = []
+    for a in range(int(pre*(shape + 1)+2)):
+        num = 0
+        suite2.append(0)
+        for i in range(shape):
+            num+= Inc[i]*(((a-1)/pre)**(shape-1-i))
+        suite[0].append(num) 
+        suite[1].append((a-1)/pre)   
+    fig = plt.figure()
+    plt.plot(suite[1],suite[0])
+    plt.plot(suite[1],suite2)
+    plt.xticks([suite[1][pre*e+1] for e in range(ceil(len(suite[1])/pre-1))])
+    fig.savefig('plot.png')
+
+def display_image():
+    subprocess.call(['xdg-open','/home/alexandre/Documents/python/math/plot.png'])
+
+figure(Inc,shape,20)
+display_image()
